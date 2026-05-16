@@ -4,7 +4,7 @@ A macOS-only Laravel Zero CLI for finding direct child projects with `node_modul
 
 This project is intentionally conservative. Version 1 scans one level down only, prompts before every cleanup action, and targets only folders named exactly `node_modules`.
 
-## Planned Usage
+## Usage
 
 ```bash
 php modtrash cleanup /path/to/projects
@@ -17,6 +17,12 @@ php modtrash cleanup ~/Dropbox/dev/projects/_in_progress
 ```
 
 For each matching project, the command will show the project path, the `node_modules` path, and the estimated size before asking whether to move it to Trash.
+
+Choices:
+
+- `y` moves that project's `node_modules` folder to Trash.
+- `n` skips it.
+- `q` stops prompting and prints a summary.
 
 ## Scope
 

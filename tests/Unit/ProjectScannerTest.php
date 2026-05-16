@@ -42,3 +42,26 @@ it('finds direct child projects with node_modules only', function () {
         removeProjectScannerFixture($root);
     }
 });
+
+it('finds the root folder when it directly contains node_modules', function () {
+    $root = sys_get_temp_dir().DIRECTORY_SEPARATOR.'modtrash-project-scanner-'.bin2hex(random_bytes(8));
+    $projectPath = $root.DIRECTORY_SEPARATOR.'project-a';
+    $nodeModulesPath = $projectPath.DIRECTORY_SEPARATOR.'node_modules';
+
+    mkdir($nodeModulesPath, 0777, true);
+
+    try {
+        $scanner = new ProjectScanner;
+
+        $candidates = $scanner->scan($projectPath);
+
+        expect($candidates)
+            ->toHaveCount(1)
+            ->and($candidates[0]->projectName)->toBe('project-a')
+            ->and($candidates[0]->projectPath)->toBe($projectPath)
+            ->and($candidates[0]->nodeModulesPath)->toBe($nodeModulesPath)
+            ->and($scanner->checkedProjects())->toBe(1);
+    } finally {
+        removeProjectScannerFixture($root);
+    }
+});

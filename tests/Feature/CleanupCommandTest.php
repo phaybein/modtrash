@@ -75,3 +75,34 @@ it('skips a discovered node_modules folder when the user answers no', function (
         removeCleanupCommandFixture($root);
     }
 });
+
+it('skips a direct project node_modules folder when the user answers no', function () {
+    $projectPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'modtrash-cleanup-command-direct-'.bin2hex(random_bytes(8));
+    $nodeModules = $projectPath.DIRECTORY_SEPARATOR.'node_modules';
+
+    mkdir($nodeModules, 0777, true);
+    file_put_contents($nodeModules.DIRECTORY_SEPARATOR.'package.json', '{}');
+
+    $this->app->instance(MacOsTrashManager::class, cleanupCommandTrashManager());
+
+    try {
+        $this->artisan('cleanup', ['path' => $projectPath])
+            ->expectsOutputToContain('Project: '.basename($projectPath))
+            ->expectsOutputToContain("node_modules: {$nodeModules}")
+            ->expectsQuestion('Move node_modules to Trash? [y/N/q]', 'n')
+            ->expectsTable(['Metric', 'Count'], [
+                ['Projects checked', '1'],
+                ['node_modules found', '1'],
+                ['Moved to Trash', '0'],
+                ['Skipped', '1'],
+                ['Failed', '0'],
+                ['Estimated moved size', '0 B'],
+            ])
+            ->assertExitCode(0);
+
+        expect($nodeModules)->toBeDirectory()
+            ->and($nodeModules.DIRECTORY_SEPARATOR.'package.json')->toBeFile();
+    } finally {
+        removeCleanupCommandFixture($projectPath);
+    }
+});

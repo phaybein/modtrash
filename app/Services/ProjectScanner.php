@@ -18,6 +18,20 @@ class ProjectScanner
         $this->checkedProjects = 0;
         $candidates = [];
 
+        $nodeModulesPath = $rootPath.DIRECTORY_SEPARATOR.'node_modules';
+
+        if (is_dir($nodeModulesPath) && ! is_link($nodeModulesPath)) {
+            $this->checkedProjects = 1;
+
+            return [
+                new CleanupCandidate(
+                    projectName: basename($rootPath),
+                    projectPath: $rootPath,
+                    nodeModulesPath: $nodeModulesPath,
+                ),
+            ];
+        }
+
         try {
             $children = new FilesystemIterator($rootPath, FilesystemIterator::SKIP_DOTS);
         } catch (UnexpectedValueException) {

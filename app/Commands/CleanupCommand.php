@@ -10,9 +10,9 @@ use LaravelZero\Framework\Commands\Command;
 
 class CleanupCommand extends Command
 {
-    protected $signature = 'cleanup {path : Parent folder to scan}';
+    protected $signature = 'cleanup {path : Folder to scan}';
 
-    protected $description = 'Find direct child projects with node_modules and move them to Trash after confirmation';
+    protected $description = 'Find projects with node_modules and move them to Trash after confirmation';
 
     public function __construct(
         private readonly ProjectScanner $scanner,
@@ -64,7 +64,7 @@ class CleanupCommand extends Command
         $result['found'] = count($candidates);
 
         if ($candidates === []) {
-            $this->info('No direct child projects with node_modules were found.');
+            $this->info('No projects with node_modules were found.');
             $this->displaySummary($result);
 
             return self::SUCCESS;
